@@ -1,7 +1,7 @@
 FROM ruby:2.4.0
 
-RUN mkdir -p /var/wwww/social-recipe
-WORKDIR /var/wwww/social-recipe
+RUN mkdir -p /var/www/social-recipe
+WORKDIR /var/www/social-recipe
 COPY Gemfile Gemfile
 COPY Gemfile.lock Gemfile.lock
 RUN bundle install
