@@ -4,34 +4,12 @@ class ApplicationController < ActionController::API
 
   def authenticate
     begin
-      @user = User.find_by(token: md5_hash(token))
+      @user = User.authenticate_by_token(params[:token])
       if @user.nil?
-        render json: {msg: 'Authentication failed'}
+        render json: {msg: 'Authentication failed'}, status: :unauthorized
       end
-    rescue TokenError => msg
-      render json: {msg: msg}
+    rescue TokenError => error
+      render json: {msg: error.message}, status: error.http_status
     end
   end
-
-  def token
-    token = params[:token]
-    raise TokenError.new('Authentication failed') if token.nil?
-    begin
-      JWT.decode token, nil, false
-    rescue JWT::ExpiredSignature
-      raise TokenError('Token expired')
-    rescue JWT::DecodeError
-      raise TokenError.new('Authentication failed')
-    rescue TokenError
-      raise TokenError.new('Authentication failed')
-    end
-  end
-
-  def md5_hash(decoded_token)
-    decoded_token.each do |i|
-      return i['md5'] if i.has_key?('md5')
-    end
-    raise TokenError('Authentication failed')
-  end
-
 end
